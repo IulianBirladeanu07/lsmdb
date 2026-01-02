@@ -8,11 +8,15 @@
 namespace lsmdb {
 
 class MemTable;
+class WAL;
 
 class DBImpl : public DB {
 private:
     std::unique_ptr<MemTable> memTable_;
+    std::unique_ptr<WAL> wal_;
     std::filesystem::path path_;
+    
+    void recoverFromWAL();
 
 public:
     explicit DBImpl(const std::filesystem::path& path);
