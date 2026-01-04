@@ -28,7 +28,7 @@ public:
     void put(const std::string& key, const std::string& value);
     std::optional<std::string> get(const std::string& key) const;
 
-    size_t size() const;
+    size_t getSize() const;
     bool shouldFlush(size_t threshold) const;
     bool isDeleted(const std::string& key) const;
 

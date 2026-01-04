@@ -23,12 +23,12 @@ void MemTable::remove(const std::string& key) {
     size_.store(skiplist_->estimateMemoryUsage(), std::memory_order_relaxed);
 }
 
-size_t MemTable::size() const {
+size_t MemTable::getSize() const {
     return size_.load(std::memory_order_relaxed);
 }
 
 bool MemTable::shouldFlush(size_t threshold) const {
-    return size() >= threshold;
+    return getSize() >= threshold;
 }
 
 bool MemTable::isDeleted(const std::string& key) const {
