@@ -42,6 +42,11 @@ int SkipList::randomHeight() {
     return height;
 }
 
+bool SkipList::isDeleted(const std::string& key) const {
+    Node* node = findGreaterOrEqual(key, nullptr);
+    return node && node->key == key && node->deleted;
+}
+
 SkipList::Node* SkipList::findGreaterOrEqual(const std::string& key, Node** previous) const {
     Node* current = head_;
     int level = maxHeight_.load(std::memory_order_acquire) - 1;
@@ -106,6 +111,25 @@ void SkipList::remove(const std::string& key) {
 
     if(current && current->key == key) {
         current->deleted = true;
+    } else {
+        int height = randomHeight();
+        int currentMaxHeight = maxHeight_.load(std::memory_order_relaxed);
+
+        if(height > currentMaxHeight) {
+            for(int i = currentMaxHeight; i < height; i++) {
+                previous[i] = head_;
+            }
+            maxHeight_.store(height, std::memory_order_release);
+        }
+
+        Node* node = newNode(key, "", height, true);
+
+        for(int level = 0; level < height; level++) {
+            Node* next = previous[level]->forward[level].load(std::memory_order_relaxed);
+            node->forward[level].store(next, std::memory_order_relaxed);
+            previous[level]->forward[level].store(node, std::memory_order_release);
+        }
+
     }
 }
 

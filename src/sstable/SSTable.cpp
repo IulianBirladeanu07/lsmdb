@@ -49,6 +49,7 @@ void SSTable::create(const std::filesystem::path& path, const std::vector<SSTabl
         file.write(entry.value.data(), valueSize);
     }
     
+    uint64_t indexStartOffset = file.tellp();
     uint32_t indexSize = index.size();
     file.write(reinterpret_cast<const char*>(&indexSize), sizeof(indexSize));
     
@@ -58,6 +59,7 @@ void SSTable::create(const std::filesystem::path& path, const std::vector<SSTabl
         file.write(entry.key.data(), keySize);
         file.write(reinterpret_cast<const char*>(&entry.offset), sizeof(entry.offset));
     }
+    file.write(reinterpret_cast<const char*>(&indexStartOffset), sizeof(indexStartOffset));
 }
 
 void SSTable::loadIndex() {
@@ -66,17 +68,15 @@ void SSTable::loadIndex() {
         throw std::runtime_error("Failed to open SSTable file");
     }
     
-    file.seekg(-static_cast<std::streamoff>(sizeof(uint32_t)), std::ios::end);
+    file.seekg(-static_cast<std::streamoff>(sizeof(uint64_t)), std::ios::end);
     
+    uint64_t indexStartOffset;
+    file.read(reinterpret_cast<char*>(&indexStartOffset), sizeof(indexStartOffset));
+
+    file.seekg(indexStartOffset);
+
     uint32_t indexSize;
     file.read(reinterpret_cast<char*>(&indexSize), sizeof(indexSize));
-    
-    std::streamoff indexStart = -static_cast<std::streamoff>(
-        sizeof(uint32_t) + indexSize * (sizeof(uint32_t) + sizeof(uint64_t))
-    );
-    
-    file.seekg(indexStart, std::ios::end);
-    file.seekg(static_cast<std::streamoff>(sizeof(uint32_t)), std::ios::cur);
     
     index_.reserve(indexSize);
     for(uint32_t i = 0; i < indexSize; i++) {

@@ -30,6 +30,9 @@ public:
 
     size_t size() const;
     bool shouldFlush(size_t threshold) const;
+    bool isDeleted(const std::string& key) const;
+
+    SkipList* getSkipList() const;
 };
 
 }

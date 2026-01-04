@@ -31,4 +31,11 @@ bool MemTable::shouldFlush(size_t threshold) const {
     return size() >= threshold;
 }
 
+bool MemTable::isDeleted(const std::string& key) const {
+    return skiplist_->isDeleted(key);
+}
+
+SkipList* MemTable::getSkipList() const {
+    return skiplist_.get();
+}
 }

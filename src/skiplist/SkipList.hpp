@@ -9,10 +9,7 @@
 namespace lsmdb {
 
 class SkipList {
-private:
-    static constexpr int MAX_HEIGHT = 12;
-    static constexpr double PROBABILITY = 0.25;
-
+public:
     struct Node {
         const std::string key;
         std::string value;
@@ -22,6 +19,10 @@ private:
 
         Node(std::string k, std::string v, int h, bool del = false);
     };
+
+private:
+    static constexpr int MAX_HEIGHT = 12;
+    static constexpr double PROBABILITY = 0.25;
 
     Node* head_;
     std::atomic<int> maxHeight_;
@@ -41,8 +42,11 @@ public:
     void remove(const std::string& key);
     void put(const std::string& key, const std::string& value);
     std::optional<std::string> get(const std::string& key) const;
+    bool isDeleted(const std::string& key) const;
 
     size_t estimateMemoryUsage() const;
+    
+    Node* getHead() const { return head_; }
 };
 
 }
