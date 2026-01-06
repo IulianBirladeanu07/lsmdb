@@ -5,7 +5,11 @@ add_subdirectory(sstable)
 add_subdirectory(skiplist)
 
 add_library(lsmdb STATIC
-    db/DBImpl.cpp
+    $<TARGET_OBJECTS:lsmdb_db>
+    $<TARGET_OBJECTS:lsmdb_memtable>
+    $<TARGET_OBJECTS:lsmdb_wal>
+    $<TARGET_OBJECTS:lsmdb_sstable>
+    $<TARGET_OBJECTS:lsmdb_skiplist>
 )
 
 target_include_directories(lsmdb
@@ -14,11 +18,4 @@ target_include_directories(lsmdb
         $<INSTALL_INTERFACE:include>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
-target_link_libraries(lsmdb
-    PRIVATE
-        # lsmdb_memtable
-        # lsmdb_wal
-        # lsmdb_sstable
 )

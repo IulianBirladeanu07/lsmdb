@@ -24,9 +24,12 @@ private:
     std::mutex flushMutex_;
 
     uint64_t nextSSTableId_;
-    static constexpr size_t MEMTABLE_FLUSH_THRESHOLD = 64 * 1024 * 1024; // ~64MB
+    static constexpr size_t MEMTABLE_FLUSH_THRESHOLD = 64 * 1024 * 1024;
 
     void recoverFromWAL();
+    void loadExistingSSTables();
+    void flush();
+    void shouldFlush();
 
 public:
     explicit DBImpl(const std::filesystem::path& path);
@@ -35,8 +38,6 @@ public:
     void remove(const std::string& key) override;
     void put(const std::string& key, const std::string& value) override;
     std::optional<std::string> get(const std::string& key) override;
-
-    void shouldFlush();
 };
 
 }

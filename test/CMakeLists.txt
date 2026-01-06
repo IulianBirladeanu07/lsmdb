@@ -4,6 +4,7 @@ add_executable(basic_lsmdb_test BasicLSMDBTest.cpp)
 target_link_libraries(basic_lsmdb_test PRIVATE
     lsmdb_db 
     lsmdb_memtable
+    lsmdb_sstable
     lsmdb_skiplist
     lsmdb_wal
 )
